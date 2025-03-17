@@ -1,6 +1,6 @@
 commit-analyzer:
   handler: src/functions/commit_analyzer.handler
-  timeout: 29
+  timeout: 900
   events:
     - http:
         path: /commit/analyze
