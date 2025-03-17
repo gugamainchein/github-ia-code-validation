@@ -1,0 +1,1 @@
+# GitHub IA - Code Validation

@@ -1,0 +1,10 @@
+commit-analyzer:
+  handler: src/functions/commit_analyzer.handler
+  timeout: 29
+  events:
+    - http:
+        path: /commit/analyze
+        method: post
+        cors: true
+  layers:
+    - Ref: CommonDependenciesLambdaLayer

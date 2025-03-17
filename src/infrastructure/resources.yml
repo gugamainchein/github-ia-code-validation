@@ -1,0 +1,21 @@
+Resources:
+  ApiGatewayRestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: ${param:API_NAME}-${aws:region}-${aws:accountId}-${sls:stage}
+
+  CommitsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: ${param:API_NAME}-${aws:region}-${aws:accountId}-${sls:stage}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: project_name
+          AttributeType: S
+        - AttributeName: commit_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: project_name
+          KeyType: HASH
+        - AttributeName: commit_id
+          KeyType: RANGE

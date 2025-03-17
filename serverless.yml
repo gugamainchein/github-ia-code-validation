@@ -1,0 +1,50 @@
+org: mainchein
+app: github-ia
+service: github-ia-back-end
+
+provider:
+  name: aws
+  runtime: python3.12
+  endpointType: REGIONAL
+  memorySize: 256
+  stackTags:
+    owner: "gustavo.mainchein"
+    project: "study"
+  deploymentBucket:
+    name: ${param:API_NAME}-${aws:region}-${aws:accountId}
+  iamRoleStatements:
+    - Effect: Allow
+      Resource:
+        - arn:aws:bedrock:${aws:region}::foundation-model/deepseek.r1-v1:0
+        - arn:aws:bedrock:us-east-2::foundation-model/deepseek.r1-v1:0
+        - arn:aws:bedrock:us-west-2::foundation-model/deepseek.r1-v1:0
+        - arn:aws:bedrock:${aws:region}:${aws:accountId}:inference-profile/us.deepseek.r1-v1:0
+        - arn:aws:s3:::${param:API_NAME}-${aws:region}-${aws:accountId}/*
+        - arn:aws:s3:::${param:API_NAME}-${aws:region}-${aws:accountId}
+        - !GetAtt CommitsTable.Arn
+      Action:
+        - "s3:*"
+        - "dynamodb:PutItem"
+        - "logs:*"
+        - "bedrock:InvokeModel"
+  environment:
+    DYNAMODB_TABLE_NAME: !Ref CommitsTable
+  apiGateway:
+    minimumCompressionSize: 1024
+
+package:
+  patterns:
+    - "!src/layers"
+    - "!venv"
+
+layers:
+  commonDependencies:
+    path: src/layers/common
+    compatibleRuntimes:
+      - python3.12
+
+functions:
+  - ${file(./src/functions/functions.yml)}
+
+resources:
+  - ${file(./src/infrastructure/resources.yml)}
